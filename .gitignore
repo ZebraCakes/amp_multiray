@@ -39,3 +39,7 @@
 
 # debug information files
 *.dwo
+
+.zig-cache
+build
+compile_commands.json
