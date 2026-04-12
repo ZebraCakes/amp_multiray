@@ -3,6 +3,7 @@
 #include "amp_def.h"
 #include "color.h"
 #include "hittable.h"
+#include "vec3.h"
 
 struct camera
 {
@@ -10,7 +11,8 @@ struct camera
     i32 image_width = 100;
     i32 image_height;
     i32 samples_per_pixel = 10;
-    f64 pixel_samples_scale;
+    f64 pixel_samples_scale = 10;
+    i32 max_depth = 10;
 
     point3 center;
     point3 pixel00_loc;
@@ -39,7 +41,7 @@ struct camera
                     ++sample)
                 {
                     ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world);
                 }
 
                 write_color(std::cout, pixel_samples_scale*pixel_color);
@@ -93,12 +95,17 @@ private:
         return v3(random_f64() - 0.5, random_f64() - 0.5, 0);
     }
 
-    color ray_color(const ray& r, const hittable& world) const
+    color ray_color(const ray& r, i32 depth, const hittable& world) const
     {
-        hit_record record;
-        if(world.hit(r, interval(0, infinity), record))
+        if(depth <= 0)
         {
-            return 0.5*(record.normal + color(1, 1, 1));
+            return color(0,0,0);
+        }
+        hit_record record;
+        if(world.hit(r, interval(0.002, infinity), record))
+        {
+            v3 dir = record.normal + random_unit_vector();
+            return 0.5*ray_color(ray(record.pos, dir), depth-1, world);
         }
 
         v3 unit_dir = unit_vector(r.dir);

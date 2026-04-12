@@ -57,6 +57,16 @@ struct v3
     {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
     }
+
+    static v3 random()
+    {
+        return v3(random_f64(), random_f64(), random_f64());
+    }
+
+    static v3 random(f64 min, f64 max)
+    {
+        return v3(random_f64(min, max), random_f64(min, max), random_f64(min, max));
+    }
 };
 
 using point3 = v3;
@@ -114,4 +124,32 @@ inline v3 cross(const v3& u, const v3& v)
 inline v3 unit_vector(const v3& vec)
 {
     return vec/vec.length();
+}
+
+inline v3
+random_unit_vector()
+{
+    while(true)
+    {
+        v3 pos = v3::random(-1, 1);
+        f64 len_sq = pos.length_squared();
+        if(1e-160 < len_sq && len_sq <= 1)
+        {
+            return pos / sqrt(len_sq);
+        }
+    }
+}
+
+inline v3
+random_on_hemisphere(const v3& normal)
+{
+    v3 on_unit_sphere = random_unit_vector();
+    if(dot(on_unit_sphere, normal) > 0.0) // in the same hemisphere/direction
+    {
+        return on_unit_sphere;
+    }
+    else
+    {
+        return -on_unit_sphere;
+    }
 }
