@@ -1,14 +1,43 @@
 #include <iostream>
 
-#include "vec3.h"
 #include "color.h"
+#include "ray.h"
+#include "vec3.h"
+
+color
+ray_color(const ray& r)
+{
+    v3 unit_dir = unit_vector(r.dir);
+    f64 a = 0.5*(unit_dir.y + 1.0);
+    return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+}
 
 int
 main(int arg_count, char** args)
 {
     // Image
+    f64 aspect_ratio = 16.0 / 9.0;
     i32 width = 256;
-    i32 height = 256;
+    i32 height = i32(width / aspect_ratio);
+    height = (height < 1) ? 1 : height;
+
+    // Camera
+    f64 focal_length = 1.0;
+    f64 viewport_height = 2.0;
+    f64 viewport_width = viewport_height*((f64)width/height);
+    point3 camera_center = point3(0, 0, 0);
+
+    // Calculate the vectors across the horizontal and down the vertical viewport edges.
+    v3 viewport_u = v3(viewport_width, 0, 0);
+    v3 viewport_v = v3(0, -viewport_height, 0);
+
+    // Calculate the horizontal and vertical delta vectors from pixel to pixel.
+    v3 pixel_delta_u = viewport_u / width;
+    v3 pixel_delta_v = viewport_v / height;
+
+    // Calculate the location of the upper left pixel.
+    point3 viewport_upper_left = camera_center - v3(0, 0, focal_length) - viewport_u/2.0 - viewport_v/2.0;
+    point3 pixel00_loc = viewport_upper_left + 0.5*(pixel_delta_u + pixel_delta_v);
 
     // Render
     // Header
@@ -23,7 +52,11 @@ main(int arg_count, char** args)
             i < width;
             ++i)
         {
-            color pixel_color = color((f64)i/(width - 1.0), (f64)j/(height-1.0), 0);
+            point3 pixel_center = pixel00_loc + (i*pixel_delta_u) + (j*pixel_delta_v);
+            v3 ray_direction = pixel_center - camera_center;
+            ray r = ray(camera_center, ray_direction);
+
+            color pixel_color = ray_color(r);
             write_color(std::cout, pixel_color);
         }
     }
