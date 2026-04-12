@@ -1,0 +1,82 @@
+#pragma once
+
+#include "color.h"
+#include "hittable.h"
+
+struct camera
+{
+    f64 aspect_ratio = 1.0;
+    i32 image_width = 100;
+    i32 image_height;
+    point3 center;
+    point3 pixel00_loc;
+    v3 pixel_delta_u;
+    v3 pixel_delta_v;
+
+    void render(const hittable& world)
+    {
+        initialize();
+
+        // Header
+        std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+        for(i32 j = 0;
+            j < image_height;
+            ++j)
+        {
+            std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+            for(i32 i = 0;
+                i < image_width;
+                ++i)
+            {
+                point3 pixel_center = pixel00_loc + (i*pixel_delta_u) + (j*pixel_delta_v);
+                v3 ray_direction = pixel_center - center;
+                ray r = ray(center, ray_direction);
+
+                color pixel_color = ray_color(r, world);
+                write_color(std::cout, pixel_color);
+            }
+        }
+
+        std::clog << "\rDone.                    \n";
+    }
+
+private:
+    void initialize()
+    {
+        image_height = i32(image_width / aspect_ratio);
+        image_height = (image_height < 1) ? 1 : image_height;
+
+        center = point3(0, 0, 0);
+
+        // Determine viewport dimensions
+        f64 focal_length = 1.0;
+        f64 viewport_height = 2.0;
+        f64 viewport_width = viewport_height*((f64)image_width/image_height);
+
+        // Calculate the vectors across the horizontal and down the vertical viewport edges.
+        v3 viewport_u = v3(viewport_width, 0, 0);
+        v3 viewport_v = v3(0, -viewport_height, 0);
+
+        // Calculate the horizontal and vertical delta vectors from pixel to pixel.
+        pixel_delta_u = viewport_u / image_width;
+        pixel_delta_v = viewport_v / image_height;
+
+        // Calculate the location of the upper left pixel.
+        point3 viewport_upper_left = center - v3(0, 0, focal_length) - viewport_u/2.0 - viewport_v/2.0;
+        pixel00_loc = viewport_upper_left + 0.5*(pixel_delta_u + pixel_delta_v);
+    }
+
+    color ray_color(const ray& r, const hittable& world) const
+    {
+        hit_record record;
+        if(world.hit(r, interval(0, infinity), record))
+        {
+            return 0.5*(record.normal + color(1, 1, 1));
+        }
+
+        v3 unit_dir = unit_vector(r.dir);
+        f64 a = 0.5*(unit_dir.y + 1.0);
+        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+    }
+};
