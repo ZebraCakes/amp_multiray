@@ -1,5 +1,6 @@
 #pragma once
 
+#include "interval.h"
 #include "ray.h"
 
 struct hit_record
@@ -20,5 +21,5 @@ struct hittable
 {
     virtual ~hittable() = default;
 
-    virtual b32 hit(const ray& r, f64 ray_tmin, f64 ray_tmax, hit_record& record) const = 0;
+    virtual b32 hit(const ray& r, interval ray_t, hit_record& record) const = 0;
 };

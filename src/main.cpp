@@ -11,7 +11,7 @@ color
 ray_color(const ray& r, const hittable& world)
 {
     hit_record record;
-    if(world.hit(r, 0, infinity, record))
+    if(world.hit(r, interval(0, infinity), record))
     {
         return 0.5*(record.normal + color(1, 1, 1));
     }

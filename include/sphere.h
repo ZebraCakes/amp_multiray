@@ -11,7 +11,7 @@ struct sphere : public hittable
 
     sphere(const point3& center, f64 radius) : center(center), radius(std::fmax(0, radius)) {}
 
-    b32 hit(const ray& r, f64 ray_tmin, f64 ray_tmax, hit_record& record) const override
+    b32 hit(const ray& r, interval ray_t, hit_record& record) const override
     {
         v3 oc = center - r.origin;
         f64 a = r.dir.length_squared();
@@ -27,10 +27,10 @@ struct sphere : public hittable
         f64 sqrt = std::sqrt(discriminant);
 
         f64 root = (h - sqrt) / a;
-        if(root <= ray_tmin || ray_tmax <= root)
+        if(!ray_t.surrounds(root))
         {
             root = (h + sqrt) / a;
-            if(root <= ray_tmin || ray_tmax <= root)
+            if(!ray_t.surrounds(root))
             {
                 return false;
             }

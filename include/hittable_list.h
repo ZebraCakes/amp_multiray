@@ -15,15 +15,15 @@ struct hittable_list : public hittable
     hittable_list() {}
     hittable_list(shared_ptr<hittable> object) { objects.push_back(object);}
 
-    b32 hit(const ray& r, f64 ray_tmin, f64 ray_tmax, hit_record& record) const override
+    b32 hit(const ray& r, interval ray_t, hit_record& record) const override
     {
         b32 result = false;
         hit_record temp_record;
-        f64 closest_t = ray_tmax;
+        f64 closest_t = ray_t.max;
 
         for(const auto& object: objects)
         {
-            if(object->hit(r, ray_tmin, closest_t, temp_record))
+            if(object->hit(r, interval(ray_t.min, closest_t), temp_record))
             {
                 result = true;
                 closest_t = temp_record.t;
