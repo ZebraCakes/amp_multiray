@@ -30,6 +30,7 @@ main(int arg_count, char** args)
         j < height;
         ++j)
     {
+        std::clog << "\rScanlines remaining: " << (height - j) << ' ' << std::flush;
         for(i32 i = 0;
             i < width;
             ++i)
@@ -46,4 +47,6 @@ main(int arg_count, char** args)
             std::cout << ir << ' ' << ig << ' ' << ib << '\n';
         }
     }
+
+    std::clog << "\rDone.                    \n";
 }
