@@ -4,12 +4,28 @@
 #include "ray.h"
 #include "vec3.h"
 
+b32
+hit_sphere(const point3& center, f64 radius, const ray& r)
+{
+    v3 oc = center - r.origin;
+    f64 a = dot(r.dir, r.dir);
+    f64 b = -2.0*dot(r.dir, oc);
+    f64 c = dot(oc, oc) - radius*radius;
+    f64 discriminant = b*b - 4*a*c;
+    return (discriminant >= 0);
+}
+
 color
 ray_color(const ray& r)
 {
-    v3 unit_dir = unit_vector(r.dir);
-    f64 a = 0.5*(unit_dir.y + 1.0);
-    return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+    if(!hit_sphere(point3(0, 0, -1), 0.5, r))
+    {
+        v3 unit_dir = unit_vector(r.dir);
+        f64 a = 0.5*(unit_dir.y + 1.0);
+        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+    }
+
+    return color(1, 0, 0);
 }
 
 int
@@ -17,7 +33,7 @@ main(int arg_count, char** args)
 {
     // Image
     f64 aspect_ratio = 16.0 / 9.0;
-    i32 width = 256;
+    i32 width = 400;
     i32 height = i32(width / aspect_ratio);
     height = (height < 1) ? 1 : height;
 
