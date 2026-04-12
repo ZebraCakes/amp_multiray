@@ -1,5 +1,6 @@
 #pragma once
 
+#include "amp_def.h"
 #include "color.h"
 #include "hittable.h"
 
@@ -8,6 +9,9 @@ struct camera
     f64 aspect_ratio = 1.0;
     i32 image_width = 100;
     i32 image_height;
+    i32 samples_per_pixel = 10;
+    f64 pixel_samples_scale;
+
     point3 center;
     point3 pixel00_loc;
     v3 pixel_delta_u;
@@ -29,12 +33,16 @@ struct camera
                 i < image_width;
                 ++i)
             {
-                point3 pixel_center = pixel00_loc + (i*pixel_delta_u) + (j*pixel_delta_v);
-                v3 ray_direction = pixel_center - center;
-                ray r = ray(center, ray_direction);
+                color pixel_color = color(0, 0, 0);
+                for(i32 sample = 0;
+                    sample < samples_per_pixel;
+                    ++sample)
+                {
+                    ray r = get_ray(i, j);
+                    pixel_color += ray_color(r, world);
+                }
 
-                color pixel_color = ray_color(r, world);
-                write_color(std::cout, pixel_color);
+                write_color(std::cout, pixel_samples_scale*pixel_color);
             }
         }
 
@@ -46,6 +54,8 @@ private:
     {
         image_height = i32(image_width / aspect_ratio);
         image_height = (image_height < 1) ? 1 : image_height;
+
+        pixel_samples_scale = 1.0 / samples_per_pixel;
 
         center = point3(0, 0, 0);
 
@@ -65,6 +75,22 @@ private:
         // Calculate the location of the upper left pixel.
         point3 viewport_upper_left = center - v3(0, 0, focal_length) - viewport_u/2.0 - viewport_v/2.0;
         pixel00_loc = viewport_upper_left + 0.5*(pixel_delta_u + pixel_delta_v);
+    }
+
+    ray get_ray(i32 i, i32 j) const
+    {
+        v3 offset = sample_square();
+        point3 pixel_sample = pixel00_loc +
+                                ((i + offset.x)*pixel_delta_u) +
+                                ((j + offset.y)*pixel_delta_v);
+        v3 ray_origin = center;
+        v3 ray_direction = pixel_sample - ray_origin;
+        return ray(center, ray_direction);
+    }
+
+    v3 sample_square() const
+    {
+        return v3(random_f64() - 0.5, random_f64() - 0.5, 0);
     }
 
     color ray_color(const ray& r, const hittable& world) const

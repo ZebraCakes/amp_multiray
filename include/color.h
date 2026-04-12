@@ -1,5 +1,6 @@
 #pragma once
 
+#include "interval.h"
 #include "vec3.h"
 
 #include <iostream>
@@ -13,9 +14,10 @@ write_color(std::ostream& out, const color& pixel_color)
     f64 g = pixel_color.y;
     f64 b = pixel_color.z;
 
-    i32 ir = (i32)(255.999*r);
-    i32 ig = (i32)(255.999*g);
-    i32 ib = (i32)(255.999*b);
+    internal const interval intensity(0.000, 0.999);
+    i32 ir = (i32)(256 * intensity.clamp(r));
+    i32 ig = (i32)(256 * intensity.clamp(g));
+    i32 ib = (i32)(256 * intensity.clamp(b));
 
     out << ir << ' ' << ig << ' ' << ib << '\n';
 }
