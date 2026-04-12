@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <limits>
+#include <memory>
 #include <sys/types.h>
 
 using u8  = uint8_t;
@@ -49,3 +51,16 @@ using bitset64 = u64;
 #define ASSERT(exp)
 #define STATIC_ASSERT(exp)
 #endif
+
+// NOTE(apeterson): From rtweekend.h in the book
+using std::make_shared;
+using std::shared_ptr;
+
+const f64 infinity = std::numeric_limits<f64>::infinity();
+const f64 pi = 3.1415926535897932385;
+
+inline f64
+degrees_to_radians(f64 degrees)
+{
+    return degrees * pi/180.0;
+}

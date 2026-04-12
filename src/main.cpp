@@ -1,31 +1,24 @@
 #include <iostream>
 
 #include "color.h"
+#include "hittable.h"
+#include "hittable_list.h"
 #include "ray.h"
+#include "sphere.h"
 #include "vec3.h"
 
-b32
-hit_sphere(const point3& center, f64 radius, const ray& r)
-{
-    v3 oc = center - r.origin;
-    f64 a = dot(r.dir, r.dir);
-    f64 b = -2.0*dot(r.dir, oc);
-    f64 c = dot(oc, oc) - radius*radius;
-    f64 discriminant = b*b - 4*a*c;
-    return (discriminant >= 0);
-}
-
 color
-ray_color(const ray& r)
+ray_color(const ray& r, const hittable& world)
 {
-    if(!hit_sphere(point3(0, 0, -1), 0.5, r))
+    hit_record record;
+    if(world.hit(r, 0, infinity, record))
     {
-        v3 unit_dir = unit_vector(r.dir);
-        f64 a = 0.5*(unit_dir.y + 1.0);
-        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+        return 0.5*(record.normal + color(1, 1, 1));
     }
 
-    return color(1, 0, 0);
+    v3 unit_dir = unit_vector(r.dir);
+    f64 a = 0.5*(unit_dir.y + 1.0);
+    return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
 }
 
 int
@@ -36,6 +29,11 @@ main(int arg_count, char** args)
     i32 width = 400;
     i32 height = i32(width / aspect_ratio);
     height = (height < 1) ? 1 : height;
+
+    // World
+    hittable_list world;
+    world.objects.push_back(make_shared<sphere>(point3(0, 0, -1), 0.5));
+    world.objects.push_back(make_shared<sphere>(point3(0, -100.5, -1), 100));
 
     // Camera
     f64 focal_length = 1.0;
@@ -72,7 +70,7 @@ main(int arg_count, char** args)
             v3 ray_direction = pixel_center - camera_center;
             ray r = ray(camera_center, ray_direction);
 
-            color pixel_color = ray_color(r);
+            color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }
