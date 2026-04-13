@@ -4,6 +4,7 @@
 #include "color.h"
 #include "hittable.h"
 #include "vec3.h"
+#include "material.h"
 
 struct camera
 {
@@ -102,10 +103,15 @@ private:
             return color(0,0,0);
         }
         hit_record record;
-        if(world.hit(r, interval(0.002, infinity), record))
+        if(world.hit(r, interval(0.001, infinity), record))
         {
-            v3 dir = record.normal + random_unit_vector();
-            return 0.5*ray_color(ray(record.pos, dir), depth-1, world);
+            ray scattered;
+            color attenuation;
+            if(record.mat->scatter(r, record, attenuation, scattered))
+            {
+                return attenuation*ray_color(scattered, depth-1, world);
+            }
+            return color(0, 0, 0);
         }
 
         v3 unit_dir = unit_vector(r.dir);

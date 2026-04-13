@@ -2,11 +2,15 @@
 
 #include "interval.h"
 #include "ray.h"
+#include <memory>
+
+struct material;
 
 struct hit_record
 {
     point3 pos;
     v3 normal;
+    std::shared_ptr<material> mat;
     f64 t;
     b32 front_face;
 
