@@ -1,5 +1,6 @@
 #pragma once
 
+#include "amp_def.h"
 #include "color.h"
 #include "hittable.h"
 #include "vec3.h"
@@ -69,7 +70,7 @@ struct dielectric : public material
         b32 cannot_refract = ri*sin_theta > 1.0;
         v3 direction;
 
-        if(cannot_refract)
+        if(cannot_refract || reflectance(cos_theta, ri) > random_f64())
         {
             direction = reflect(unit_direction, rec.normal);
         }
@@ -80,5 +81,12 @@ struct dielectric : public material
 
         scattered = ray(rec.pos, direction);
         return true;
+    }
+
+    static f64 reflectance(f64 cosine, f64 refraction_index)
+    {
+        f64 r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
+        r0 = r0*r0;
+        return r0 + (1-r0)*std::pow((1.0 - cosine), 5.0);
     }
 };
