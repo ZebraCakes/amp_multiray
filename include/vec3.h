@@ -165,3 +165,12 @@ reflect(const v3& v, const v3& n)
 {
     return v - 2*dot(v,n)*n;
 }
+
+inline v3
+refract(const v3& uv, const v3& n, f64 etai_over_etat)
+{
+    f64 cos_theta = std::fmin(dot(-uv, n), 1.0);
+    v3 r_out_perp = etai_over_etat*(uv + cos_theta*n);
+    v3 r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.length_squared()))*n;
+    return r_out_perp + r_out_parallel;
+}

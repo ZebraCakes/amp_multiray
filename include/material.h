@@ -50,3 +50,21 @@ struct metal : public material
     }
 
 };
+
+struct dielectric : public material
+{
+    f64 refraction_index;
+    dielectric(f64 refraction_index) : refraction_index(refraction_index) {}
+
+    b32 scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override
+    {
+        attenuation = color(1.0, 1.0, 1.0);
+        f64 ri = rec.front_face ? (1.0/refraction_index) : refraction_index;
+
+        v3 unit_direction = unit_vector(r_in.dir);
+        v3 refracted = refract(unit_direction, rec.normal, ri);
+
+        scattered = ray(rec.pos, refracted);
+        return true;
+    }
+};
