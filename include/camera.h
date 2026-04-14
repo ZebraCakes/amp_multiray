@@ -16,6 +16,10 @@ struct camera
     i32 max_depth = 10;
 
     f64 fov_y = 90.0;
+    point3 look_from = point3(0,0, 0);
+    point3 look_at   = point3(0,0,-1);
+    v3 up            = v3(0,1,0);
+    v3 u, v, w;
 
     point3 center;
     point3 pixel00_loc;
@@ -62,25 +66,30 @@ private:
 
         pixel_samples_scale = 1.0 / samples_per_pixel;
 
-        center = point3(0, 0, 0);
+        center = look_from;
 
         // Determine viewport dimensions
-        f64 focal_length = 1.0;
+        f64 focal_length = (look_from - look_at).length();
         f64 theta = degrees_to_radians(fov_y);
         f64 h = std::tan(theta/2.0);
         f64 viewport_height = 2.0*h*focal_length;
         f64 viewport_width = viewport_height*((f64)image_width/image_height);
 
+        // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+        w = unit_vector(look_from - look_at);
+        u = unit_vector(cross(up, w));
+        v = cross(w, u);
+
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        v3 viewport_u = v3(viewport_width, 0, 0);
-        v3 viewport_v = v3(0, -viewport_height, 0);
+        v3 viewport_u = viewport_width*u; // vector across viewport horizontal edge
+        v3 viewport_v = viewport_height*-v; // vector down viewport vertical edge
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height;
 
         // Calculate the location of the upper left pixel.
-        point3 viewport_upper_left = center - v3(0, 0, focal_length) - viewport_u/2.0 - viewport_v/2.0;
+        point3 viewport_upper_left = center - focal_length*w - viewport_u/2.0 - viewport_v/2.0;
         pixel00_loc = viewport_upper_left + 0.5*(pixel_delta_u + pixel_delta_v);
     }
 
