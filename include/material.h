@@ -3,6 +3,7 @@
 #include "color.h"
 #include "hittable.h"
 #include "vec3.h"
+#include <cmath>
 
 struct material
 {
@@ -62,9 +63,22 @@ struct dielectric : public material
         f64 ri = rec.front_face ? (1.0/refraction_index) : refraction_index;
 
         v3 unit_direction = unit_vector(r_in.dir);
-        v3 refracted = refract(unit_direction, rec.normal, ri);
+        f64 cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0);
+        f64 sin_theta = std::sqrt(1.0 - cos_theta*cos_theta);
 
-        scattered = ray(rec.pos, refracted);
+        b32 cannot_refract = ri*sin_theta > 1.0;
+        v3 direction;
+
+        if(cannot_refract)
+        {
+            direction = reflect(unit_direction, rec.normal);
+        }
+        else
+        {
+            direction = refract(unit_direction, rec.normal, ri);
+        }
+
+        scattered = ray(rec.pos, direction);
         return true;
     }
 };
