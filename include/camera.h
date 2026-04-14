@@ -12,8 +12,10 @@ struct camera
     i32 image_width = 100;
     i32 image_height;
     i32 samples_per_pixel = 10;
-    f64 pixel_samples_scale = 10;
+    f64 pixel_samples_scale = 10.0;
     i32 max_depth = 10;
+
+    f64 fov_y = 90.0;
 
     point3 center;
     point3 pixel00_loc;
@@ -64,7 +66,9 @@ private:
 
         // Determine viewport dimensions
         f64 focal_length = 1.0;
-        f64 viewport_height = 2.0;
+        f64 theta = degrees_to_radians(fov_y);
+        f64 h = std::tan(theta/2.0);
+        f64 viewport_height = 2.0*h*focal_length;
         f64 viewport_width = viewport_height*((f64)image_width/image_height);
 
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
