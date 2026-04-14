@@ -133,6 +133,19 @@ inline v3 unit_vector(const v3& vec)
 }
 
 inline v3
+random_in_unit_disk()
+{
+    while(true)
+    {
+        v3 pos = v3(random_f64(-1,1), random_f64(-1,1), 0);
+        if(pos.length_squared() < 1.0)
+        {
+            return pos;
+        }
+    }
+}
+
+inline v3
 random_unit_vector()
 {
     while(true)
