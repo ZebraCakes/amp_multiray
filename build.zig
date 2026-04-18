@@ -5,6 +5,12 @@ pub fn build(bld: *std.Build) void {
     const target   = bld.standardTargetOptions(.{});
     const optimize = bld.standardOptimizeOption(.{});
 
+    const slow = bld.option(
+        bool,
+        "slow",
+        "Enable MM_SLOW flag"
+    ) orelse false;
+
     const exe_mod = bld.createModule(.{
         .target    = target,
         .optimize  = optimize,
@@ -16,9 +22,13 @@ pub fn build(bld: *std.Build) void {
         .root_module = exe_mod,
     });
 
+    var flags: std.ArrayListUnmanaged([]const u8) = .empty;
+    defer flags.deinit(bld.allocator);
+    flags.append(bld.allocator, "-std=c++17") catch unreachable;
+    if (slow) flags.append(bld.allocator, "-DAMP_SLOW=1") catch unreachable;
     exe_mod.addCSourceFiles(.{
         .files = &.{"src/main.cpp"},
-        .flags = &.{"-std=c++17"},
+        .flags = flags.items,
     });
 
     exe_mod.addIncludePath(bld.path("include"));
