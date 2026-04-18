@@ -1,7 +1,7 @@
 #pragma once
 
-#include "interval.h"
 #include "vec3.h"
+#include "interval.h"
 
 #include <cmath>
 #include <iostream>

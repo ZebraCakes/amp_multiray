@@ -79,3 +79,9 @@ random_f64(f64 min, f64 max)
 {
     return min + (max-min)*random_f64();
 }
+
+inline i32
+random_i32(i32 min, i32 max)
+{
+    return i32(random_f64(min, max+1));
+}

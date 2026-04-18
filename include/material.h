@@ -1,9 +1,9 @@
 #pragma once
 
+#include "vec3.h"
 #include "amp_def.h"
 #include "color.h"
 #include "hittable.h"
-#include "vec3.h"
 #include <cmath>
 
 struct material

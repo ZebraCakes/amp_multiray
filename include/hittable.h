@@ -1,7 +1,8 @@
 #pragma once
 
-#include "interval.h"
+#include "aabb.h"
 #include "ray.h"
+#include "interval.h"
 #include <memory>
 
 struct material;
@@ -23,7 +24,10 @@ struct hit_record
 
 struct hittable
 {
+    aabb bbox;
     virtual ~hittable() = default;
 
-    virtual b32 hit(const ray& r, interval ray_t, hit_record& record) const = 0;
+    virtual b32
+    hit(const ray& r, interval ray_t, hit_record& record) const = 0;
+
 };

@@ -1,8 +1,9 @@
+#include "bvh.h"
+#include "vec3.h"
 #include "amp_def.h"
 #include "camera.h"
 #include "hittable_list.h"
 #include "sphere.h"
-#include "vec3.h"
 #include <memory>
 
 int
@@ -11,7 +12,7 @@ main(int arg_count, char** args)
     hittable_list world;
 
     shared_ptr<material> ground_material = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
-    world.objects.push_back(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
+    world.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
     for(i32 a = -11;
         a < 11;
@@ -34,7 +35,7 @@ main(int arg_count, char** args)
                     color albedo = color::random()*color::random();
                     sphere_material = make_shared<lambertian>(albedo);
                     point3 center_end = center + v3(0.0, random_f64(0, 0.5), 0.0);
-                    world.objects.push_back(make_shared<sphere>(center, center_end, 0.2, sphere_material));
+                    world.add(make_shared<sphere>(center, center_end, 0.2, sphere_material));
                 }
                 else if(choose_mat < 0.95)
                 {
@@ -42,13 +43,13 @@ main(int arg_count, char** args)
                     color albedo = color::random(0.5, 1.0);
                     f64 fuzz = random_f64(0.0, 0.5);
                     sphere_material = make_shared<metal>(albedo, fuzz);
-                    world.objects.push_back(make_shared<sphere>(center, 0.2, sphere_material));
+                    world.add(make_shared<sphere>(center, 0.2, sphere_material));
                 }
                 else
                 {
                     // glass
                     sphere_material = make_shared<dielectric>(1.5);
-                    world.objects.push_back(make_shared<sphere>(center, 0.2, sphere_material));
+                    world.add(make_shared<sphere>(center, 0.2, sphere_material));
                 }
 
             }
@@ -56,13 +57,15 @@ main(int arg_count, char** args)
     }
 
     shared_ptr<material> material_1 = make_shared<dielectric>(1.5);
-    world.objects.push_back(make_shared<sphere>(point3(0, 1, 0), 1.0, material_1));
+    world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material_1));
 
     shared_ptr<material> material_2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
-    world.objects.push_back(make_shared<sphere>(point3(-4, 1, 0), 1.0, material_2));
+    world.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material_2));
 
     shared_ptr<material> material_3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
-    world.objects.push_back(make_shared<sphere>(point3(4, 1, 0), 1.0, material_3));
+    world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material_3));
+
+    world = hittable_list(make_shared<bvh_node>(world));
 
     camera cam;
 

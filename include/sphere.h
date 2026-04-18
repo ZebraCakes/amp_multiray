@@ -14,12 +14,34 @@ struct sphere : public hittable
 
     // Stationary spehere
     sphere(const point3& static_center, f64 radius, shared_ptr<material> mat) : center(static_center, v3(0,0,0)),
-                                                                                radius(std::fmax(0, radius)), mat(mat) {}
+                                                                                radius(std::fmax(0, radius)), mat(mat)
+    {
+        v3 rvec = v3(radius, radius, radius);
+        bbox = aabb(static_center - rvec, static_center + rvec);
+        ASSERT(std::isfinite(bbox.x.min) &&
+               std::isfinite(bbox.y.min) &&
+               std::isfinite(bbox.z.min) &&
+               std::isfinite(bbox.x.max) &&
+               std::isfinite(bbox.y.max) &&
+               std::isfinite(bbox.z.max));
+    }
 
     // Moving sphere
     sphere(const point3& center_start, const point3& center_end, f64 radius, shared_ptr<material> mat) :
                                                                                 center(center_start, center_end - center_start),
-                                                                                radius(std::fmax(0, radius)), mat(mat) {}
+                                                                                radius(std::fmax(0, radius)), mat(mat)
+    {
+        v3 rvec = v3(radius, radius, radius);
+        aabb box_start(center.at(0.0) - rvec, center.at(0.0) + rvec);
+        aabb box_end(center.at(1.0) - rvec, center.at(1.0) + rvec);
+        bbox = aabb(box_start, box_end);
+        ASSERT(std::isfinite(bbox.x.min) &&
+               std::isfinite(bbox.y.min) &&
+               std::isfinite(bbox.z.min) &&
+               std::isfinite(bbox.x.max) &&
+               std::isfinite(bbox.y.max) &&
+               std::isfinite(bbox.z.max));
+    }
 
     b32 hit(const ray& r, interval ray_t, hit_record& record) const override
     {
