@@ -1,4 +1,5 @@
 #include "bvh.h"
+#include "material.h"
 #include "vec3.h"
 #include "amp_def.h"
 #include "camera.h"
@@ -6,8 +7,8 @@
 #include "sphere.h"
 #include <memory>
 
-int
-main(int arg_count, char** args)
+void
+bouncing_spheres()
 {
     hittable_list world;
 
@@ -83,5 +84,50 @@ main(int arg_count, char** args)
     cam.focus_dist    = 10.0;
 
     cam.render(world);
+
+}
+
+void
+checkered_spheres()
+{
+    hittable_list world;
+
+    std::shared_ptr<texture> checker = make_shared<checker_texture>(0.32, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+
+    world.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<lambertian>(checker)));
+    world.add(make_shared<sphere>(point3(0,  10, 0), 10, make_shared<lambertian>(checker)));
+
+    camera cam;
+
+    cam.aspect_ratio      = 16.0/9.0;
+    cam.image_width       = 400;
+    cam.samples_per_pixel = 100;
+    cam.max_depth         = 50;
+
+    cam.fov_y     = 20.0;
+    cam.look_from = point3(13,2,3);
+    cam.look_at   = point3(0,0,0);
+    cam.up        = v3(0,1,0);
+
+    cam.defocus_angle = 0.0;
+
+    cam.render(world);
+}
+
+int main(int arg_count, char** args)
+{
+    i32 selection = arg_count > 1 ? (i32)(args[1][0] - '0') : 0;
+
+    switch(selection)
+    {
+        case 0:
+        {
+            bouncing_spheres();
+        }break;
+        case 1:
+        {
+            checkered_spheres();
+        }break;
+    }
 
 }
