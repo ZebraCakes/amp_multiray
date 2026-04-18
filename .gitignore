@@ -45,4 +45,5 @@ build
 compile_commands.json
 .cache
 *.ppm
+*.png
 ses

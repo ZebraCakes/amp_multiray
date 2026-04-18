@@ -77,57 +77,67 @@ struct v3
 
 using point3 = v3;
 
-inline std::ostream& operator<<(std::ostream& out, const v3& v)
+inline std::ostream&
+operator<<(std::ostream& out, const v3& v)
 {
     return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
 }
 
-inline v3 operator+(const v3& u, const v3& v)
+inline v3
+operator+(const v3& u, const v3& v)
 {
     return v3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
 }
 
-inline v3 operator-(const v3& u, const v3& v)
+inline v3
+operator-(const v3& u, const v3& v)
 {
     return v3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
 }
 
 // Hadamard product
-inline v3 operator*(const v3& u, const v3& v)
+inline v3
+operator*(const v3& u, const v3& v)
 {
     return v3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
 }
 
-inline v3 operator*(f64 t, const v3& vec)
+inline v3
+operator*(f64 t, const v3& vec)
 {
     return v3(t*vec.e[0], t*vec.e[1], t*vec.e[2]);
 }
 
-inline v3 operator*(const v3& vec, f64 t)
+inline v3
+operator*(const v3& vec, f64 t)
 {
     return t*vec;
 }
 
-inline v3 operator/(const v3& vec, f64 t)
+inline v3
+operator/(const v3& vec, f64 t)
 {
     return (1.0/t)*vec;
 }
 
-inline f64 dot(const v3& u, const v3& v)
+inline f64
+dot(const v3& u, const v3& v)
 {
     return u.e[0]*v.e[0] +
            u.e[1]*v.e[1] +
            u.e[2]*v.e[2];
 }
 
-inline v3 cross(const v3& u, const v3& v)
+inline v3
+cross(const v3& u, const v3& v)
 {
     return v3(u.e[1]*v.e[2] - u.e[2]*v.e[1],
               u.e[2]*v.e[0] - u.e[0]*v.e[2],
               u.e[0]*v.e[1] - u.e[1]*v.e[0]);
 }
 
-inline v3 unit_vector(const v3& vec)
+inline v3
+unit_vector(const v3& vec)
 {
     return vec/vec.length();
 }

@@ -42,7 +42,7 @@ using bitset64 = u64;
                       (b) = temp;\
 }
 
-#ifdef MM_SLOW
+#ifdef AMP_SLOW
 #define _ASSERT_GLUE(a, b) a ## b
 #define ASSERT_GLUE(a, b) _ASSERT_GLUE(a, b)
 
