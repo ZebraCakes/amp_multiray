@@ -19,7 +19,16 @@ struct bvh_node : public hittable
 
     bvh_node(std::vector<shared_ptr<hittable>>& objects, size_t start, size_t end)
     {
-        i32 axis = random_i32(0, 2);
+        // Build the bounding box of the span of source objects.
+        bbox = aabb::empty;
+        for(size_t idx = start;
+            idx < end;
+            ++idx)
+        {
+            bbox = aabb(bbox, objects[idx]->bbox);
+        }
+
+        i32 axis = bbox.longest_axis();
 
         auto comparator = (axis == 0) ? box_compare_x :
                           (axis == 1) ? box_compare_y :
@@ -44,8 +53,6 @@ struct bvh_node : public hittable
             left = make_shared<bvh_node>(objects, start, mid);
             right = make_shared<bvh_node>(objects, mid, end);
         }
-
-        bbox = aabb(left->bbox, right->bbox);
 
         ASSERT(std::isfinite(bbox.x.min) &&
                std::isfinite(bbox.y.min) &&
