@@ -1,10 +1,12 @@
 #pragma once
 
+#include "texture.h"
 #include "vec3.h"
 #include "amp_def.h"
 #include "color.h"
 #include "hittable.h"
 #include <cmath>
+#include <memory>
 
 struct material
 {
@@ -19,8 +21,10 @@ struct material
 struct lambertian : public material
 {
     color albedo;
+    std::shared_ptr<texture> tex;
 
-    lambertian(const color& albedo) : albedo(albedo) {}
+    lambertian(const color& albedo) : tex(std::make_shared<solid_color>(albedo)) {}
+    lambertian(std::shared_ptr<texture> tex) : tex(tex) {}
 
     b32 scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override
     {
@@ -30,7 +34,7 @@ struct lambertian : public material
             scatter_dir = rec.normal;
         }
         scattered = ray(rec.pos, scatter_dir, r_in.dt);
-        attenuation = albedo;
+        attenuation = tex->value(rec.u, rec.v, rec.pos);
         return true;
     }
 };

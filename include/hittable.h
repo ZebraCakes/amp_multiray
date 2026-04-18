@@ -14,6 +14,8 @@ struct hit_record
     std::shared_ptr<material> mat;
     f64 t;
     b32 front_face;
+    f64 u;
+    f64 v;
 
     void set_face_normal(const ray& r, const v3& outward_normal)
     {

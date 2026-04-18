@@ -11,7 +11,7 @@ main(int arg_count, char** args)
 {
     hittable_list world;
 
-    shared_ptr<material> ground_material = std::make_shared<lambertian>(color(0.5, 0.5, 0.5));
+    shared_ptr<material> ground_material = std::make_shared<lambertian>(std::make_shared<checker_texture>(0.32, color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9)));
     world.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
 
     for(i32 a = -11;
