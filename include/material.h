@@ -29,7 +29,7 @@ struct lambertian : public material
         {
             scatter_dir = rec.normal;
         }
-        scattered = ray(rec.pos, scatter_dir);
+        scattered = ray(rec.pos, scatter_dir, r_in.dt);
         attenuation = albedo;
         return true;
     }
@@ -46,7 +46,7 @@ struct metal : public material
     {
         v3 reflected = reflect(r_in.dir, rec.normal);
         reflected = unit_vector(reflected) + (fuzz*random_unit_vector());
-        scattered = ray(rec.pos, reflected);
+        scattered = ray(rec.pos, reflected, r_in.dt);
         attenuation = albedo;
         return dot(scattered.dir, rec.normal) > 0.0;
     }
@@ -79,7 +79,7 @@ struct dielectric : public material
             direction = refract(unit_direction, rec.normal, ri);
         }
 
-        scattered = ray(rec.pos, direction);
+        scattered = ray(rec.pos, direction, r_in.dt);
         return true;
     }
 
